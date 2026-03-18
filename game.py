@@ -9,6 +9,7 @@ from constants import (
     VOTE_FAIL_LIMIT, WIN_MISSIONS, LOSE_MISSIONS, TOTAL_ROUNDS,
 )
 from player import AvalonPlayer
+from ai import AvalonAI
 
 
 ROLE_DESCRIPTIONS = {
@@ -185,7 +186,6 @@ class AvalonGame:
                         if i not in result:
                             result.append(i); break
                 return result
-        from ai import AvalonAI
         return AvalonAI.select_team(leader, self.players, team_size,
                                     self.round_idx, self.vote_history, self.mission_results)
 
@@ -199,7 +199,6 @@ class AvalonGame:
                 })
                 votes[p.idx] = bool(val)
             else:
-                from ai import AvalonAI
                 votes[p.idx] = AvalonAI.vote_team(p, team_idxs, self.players,
                                                    self.round_idx, self.vote_history, self.mission_results)
         approve = sum(1 for v in votes.values() if v) > len(self.players) / 2
@@ -218,7 +217,6 @@ class AvalonGame:
                 })
                 cards.append(bool(val))
             else:
-                from ai import AvalonAI
                 cards.append(AvalonAI.play_mission(p, self.round_idx, self.mission_results))
         random.shuffle(cards)
         fail_count = cards.count(False)
@@ -242,7 +240,6 @@ class AvalonGame:
             })
             target_idx = int(target_idx) if target_idx is not None else good_players[0].idx
         else:
-            from ai import AvalonAI
             target_idx = AvalonAI.assassinate(assassin, self.players, self.vote_history, self.mission_results)
         target = self.players[target_idx]
         self.bridge.log(f"  {assassin.name} 刺杀了 {target.name}！", "section")
