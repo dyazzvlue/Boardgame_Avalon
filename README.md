@@ -2,6 +2,9 @@
 
 一款基于 [阿瓦隆桌游](rules.md) 规则实现的模拟器，支持 5–10 人混合对战（真人玩家 + AI 对手），提供本地图形界面与 [GamePlatform](../gameplatform) 联机模式。
 
+> **本仓库**：[https://github.com/dyazzvlue/Boardgame_Avalon](https://github.com/dyazzvlue/Boardgame_Avalon)  
+> **联机平台仓库**：[https://github.com/dyazzvlue/Boardgame_platform](https://github.com/dyazzvlue/Boardgame_platform)
+
 ---
 
 ## 目录
@@ -67,7 +70,10 @@ python3 main.py
 
 ```bash
 cd gameplatform
-AVALON_PATH=../Avalon uvicorn framework.server:app --host 0.0.0.0 --port 8000
+MANILA_PATH=../Manila \
+AVALON_PATH=../Avalon \
+INCANGOLD_PATH=../IncanGold \
+bash tools/start.sh --public
 ```
 
 浏览器访问 `http://localhost:8000`，在大厅选择"阿瓦隆"创建房间，5–10 名玩家依次加入即可开始。
@@ -185,8 +191,10 @@ Avalon 通过 [GamePlatform](../gameplatform) 框架支持 WebSocket 多人联�
 
 ```bash
 cd gameplatform
-MANILA_PATH=../Manila AVALON_PATH=../Avalon \
-  uvicorn framework.server:app --host 0.0.0.0 --port 8000
+MANILA_PATH=../Manila \
+AVALON_PATH=../Avalon \
+INCANGOLD_PATH=../IncanGold \
+bash tools/start.sh --public
 ```
 
 ---
