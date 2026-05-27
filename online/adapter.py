@@ -65,6 +65,39 @@ class AvalonGameAdapter(AbstractGame):
         if self._engine is None: return {"phase": "waiting"}
         return serialize_state(self._engine)
 
+    def get_state_for_player(self, player_idx: int) -> dict:
+        """每个玩家看到自己的角色和夜晚信息。"""
+        base = self.get_state()
+        if self._engine is None:
+            return base
+        p = self._engine.players[player_idx]
+        # 始终让玩家看到自己的角色
+        base["my_role"] = p.role.value if p.role else None
+        base["my_alignment"] = p.alignment.value if p.alignment else None
+        # 夜晚信息：你能看到谁
+        from constants import Role, ROLE_DESCRIPTIONS
+        visible = []
+        evil_idxs = [x.idx for x in self._engine.players if x.is_evil and x.role != Role.OBERON]
+        merlin_sees = [x.idx for x in self._engine.players if x.is_evil and x.role != Role.MORDRED]
+        percival_sees = ([x.idx for x in self._engine.players if x.role == Role.MERLIN] +
+                         [x.idx for x in self._engine.players if x.role == Role.MORGANA])
+        if p.role == Role.MERLIN:
+            for idx in merlin_sees:
+                q = self._engine.players[idx]
+                visible.append({"idx": idx, "name": q.name, "hint": "邪恶方"})
+        elif p.role == Role.PERCIVAL:
+            for idx in percival_sees:
+                q = self._engine.players[idx]
+                visible.append({"idx": idx, "name": q.name, "hint": "疑似梅林"})
+        elif p.is_evil and p.role != Role.OBERON:
+            for idx in evil_idxs:
+                if idx != p.idx:
+                    q = self._engine.players[idx]
+                    visible.append({"idx": idx, "name": q.name, "hint": "邪恶同伴"})
+        base["visible_players"] = visible
+        base["role_desc"] = ROLE_DESCRIPTIONS.get(p.role, "")
+        return base
+
     def on_player_disconnected(self, player_idx: int) -> None:
         if self._engine is None: return
         for p in self._engine.players:
